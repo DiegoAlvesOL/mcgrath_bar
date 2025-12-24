@@ -31,19 +31,6 @@ body {
     pointer-events: none; /* Deixa o clique passar para o menu */
 }
 
-/* Marca d'água elegante */
-body::after {
-    content: "McGrath";
-    position: fixed;
-    bottom: 5%;
-    right: -5%;
-    font-family: var(--font-heading);
-    font-size: 15vw;
-    color: rgba(74, 4, 4, 0.03);
-    z-index: -2;
-    transform: rotate(-15deg);
-    pointer-events: none;
-}
 
 /* Header Otimizado */
 .main-header {
