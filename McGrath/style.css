@@ -1,0 +1,162 @@
+:root {
+    --primary-burgundy: #4a0404;
+    --secondary-wine: #722f37;
+    --soft-gold: #c5a059;
+    --bg-cream: #fcfbf8;
+    --text-dark: #2c2c2c;
+    --text-light: #fcfbf8;
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Montserrat', sans-serif;
+    --transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-body);
+    background-color: var(--bg-cream);
+    color: var(--text-dark);
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Canvas Background */
+#canvas-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Fica atrás de tudo */
+    pointer-events: none; /* Deixa o clique passar para o menu */
+}
+
+/* Marca d'água elegante */
+body::after {
+    content: "McGrath";
+    position: fixed;
+    bottom: 5%;
+    right: -5%;
+    font-family: var(--font-heading);
+    font-size: 15vw;
+    color: rgba(74, 4, 4, 0.03);
+    z-index: -2;
+    transform: rotate(-15deg);
+    pointer-events: none;
+}
+
+/* Header Otimizado */
+.main-header {
+    background-color: var(--primary-burgundy);
+    color: var(--text-light);
+    padding: 100px 20px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.main-header h1 {
+    font-size: 2.2rem;
+    line-height: 1.2;
+    z-index: 2;
+}
+
+.main-header .light-weight {
+    color: var(--soft-gold);
+    font-style: italic;
+    font-size: 1.4rem;
+}
+
+/* Cocktail List Interativity */
+.menu-container {
+    max-width: 600px;
+    margin: -40px auto 0;
+    padding: 0 20px 60px;
+    position: relative;
+}
+
+.cocktail-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Efeito de Foco (Antigravit style) */
+.cocktail-list:hover .cocktail-item:not(:hover) {
+    opacity: 0.4;
+    filter: blur(2px);
+    transform: scale(0.98);
+}
+
+.cocktail-item {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(74, 4, 4, 0.05);
+}
+
+.cocktail-item:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(74, 4, 4, 0.1);
+    background: #fff;
+}
+
+.item-info h3 {
+    font-size: 1.3rem;
+    color: var(--primary-burgundy);
+    margin-bottom: 4px;
+}
+
+/* Modal Blur Effect */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(252, 251, 248, 0.8);
+    backdrop-filter: blur(15px); /* Efeito de vidro */
+    -webkit-backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease;
+    z-index: 1000;
+}
+
+.modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-card {
+    background: #fff;
+    width: 90%;
+    max-width: 450px;
+    max-height: 85vh;
+    overflow-y: auto;
+    border-radius: 20px;
+    padding: 40px 30px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+    transform: translateY(50px) scale(0.9);
+    transition: var(--transition);
+}
+
+.modal-overlay.open .modal-card {
+    transform: translateY(0) scale(1);
+}
+
+@media (max-width: 480px) {
+    .main-header { padding-top: 80px; }
+    .item-info h3 { font-size: 1.1rem; }
+}

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Christmas McGrath Bar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-burgundy: #4a0404;
+            --soft-gold: #c5a059;
+            --bg-cream: #fcfbf8;
+            --text-dark: #2c2c2c;
+            --transition: 0.5s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Cabeçalho ajustado para não ser sobreposto */
+        .main-header {
+            position: relative;
+            z-index: 10;
+            background-color: var(--primary-burgundy);
+            color: #fff;
+            padding: 100px 20px 100px; /* Aumentado o padding inferior */
+            text-align: center;
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
+        }
+
+        .main-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .main-header span {
+            color: var(--soft-gold);
+            font-style: italic;
+            font-size: 1.6rem;
+        }
+
+        .subtext {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 320px;
+            margin: 20px auto 0;
+            line-height: 1.6;
+        }
+
+        /* Container do Menu com margem superior maior para evitar sobreposição */
+        .menu-container {
+            position: relative;
+            z-index: 10;
+            max-width: 550px;
+            margin: 40px auto 80px; /* Margem positiva para separar do vermelho */
+            padding: 0 20px;
+        }
+
+        .cocktail-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Efeito de desfoque nos vizinhos */
+        .cocktail-list:hover .cocktail-item:not(:hover) {
+            filter: blur(5px);
+            opacity: 0.4;
+        }
+
+        .cocktail-item {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px; /* Aumentado para mobile */
+            border-radius: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+            cursor: pointer;
+            border: 1px solid rgba(74, 4, 4, 0.08);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        }
+
+        .item-info h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--primary-burgundy);
+            font-size: 1.6rem; /* Fonte maior para leitura fácil */
+            margin-bottom: 5px;
+        }
+
+        .item-subtitle {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #666;
+        }
+
+        /* Modal otimizado para Celular */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* Abre de baixo no mobile */
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.4s;
+        }
+
+        .modal-overlay.open { opacity: 1; visibility: visible; }
+
+        .modal-card {
+            background: #fff;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 30px 30px 0 0; /* Estilo 'sheet' de mobile moderno */
+            padding: 50px 30px 40px;
+            position: relative;
+            transform: translateY(100%);
+            transition: var(--transition);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.open .modal-card { transform: translateY(0); }
+
+        /* No Desktop o modal volta ao centro */
+        @media (min-width: 768px) {
+            .modal-overlay { align-items: center; }
+            .modal-card { border-radius: 30px; transform: translateY(50px); }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            background: #f0f0f0;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ingredient-list {
+            margin: 25px 0;
+            list-style: none;
+        }
+
+        .ingredient-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 1.1rem; /* Fonte maior para o celular */
+        }
+
+        .ingredient-list li::before { content: "✧ "; color: var(--soft-gold); font-weight: bold; }
+
+        .detail-section-title {
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            color: var(--soft-gold);
+            margin-top: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .simple-footer { text-align: center; padding: 60px 20px; color: #bbb; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas-bg"></canvas>
+
+<header class="main-header">
+    <h1>Christmas McGrath Bar</h1>
+    <span>Special Edition</span>
+    <p class="subtext">With gratitude to the McGrath family, for making Ireland feel like home.</p>
+</header>
+
+<main class="menu-container">
+    <ul id="cocktail-list" class="cocktail-list"></ul>
+</main>
+
+<footer class="simple-footer">
+    Sláinte! • McGrath Family Dinner • 2025
+</footer>
+
+<div id="modal-container" class="modal-overlay">
+    <div class="modal-card">
+        <button class="close-btn">&times;</button>
+        <h2 id="detail-name" style="font-family: 'Playfair Display'; color: var(--primary-burgundy); font-size: 2.2rem;"></h2>
+        <p id="detail-subtitle" style="color: var(--soft-gold); font-style: italic; font-size: 1.1rem; margin-bottom: 10px;"></p>
+
+        <h4 class="detail-section-title">Ingredients</h4>
+        <ul id="detail-ingredients" class="ingredient-list"></ul>
+
+        <h4 class="detail-section-title">The Story</h4>
+        <p id="detail-history" style="font-size: 1rem; line-height: 1.8; color: #444; margin-top: 15px;"></p>
+    </div>
+</div>
+
+<script>
+    const cocktails = [
+        { name: "Boulevardier", subtitle: "Whiskey Soul", ingredients: ["30ml Powers Whiskey", "30ml Campari", "30ml Martini Rosso", "Orange Twist"], history: "A cousin to the Negroni, swapping gin for the warmth of Irish whiskey. Perfectly bold for a Christmas night." },
+        { name: "Espresso Martini", subtitle: "Modern Classic", ingredients: ["40ml Vodka", "30ml Coffee Liqueur", "30ml Fresh Espresso"], history: "Created to wake you up and keep the party going. Rich, creamy, and sophisticated." },
+        { name: "Aperol Spritz", subtitle: "Social & Light", ingredients: ["60ml Aperol", "90ml Prosecco", "Splash of Soda"], history: "The icon of the 'Dolce Vita', bringing a touch of summer brightness to the Irish winter." },
+        { name: "Penicillin", subtitle: "Winter Cure", ingredients: ["50ml Whiskey", "Fresh Lemon", "Honey & Ginger Syrup"], history: "A soothing blend that feels like a hug in a glass. Great for digestion after a big dinner." },
+        { name: "Basil Smash", subtitle: "Herbal Freshness", ingredients: ["50ml Gin", "Lemon Juice", "Fresh Basil", "Simple Syrup"], history: "Vibrant and green, this drink is as refreshing as it is beautiful." }
+    ];
+
+    const list = document.getElementById('cocktail-list');
+    cocktails.forEach(c => {
+        const li = document.createElement('li');
+        li.className = 'cocktail-item';
+        li.innerHTML = `
+                <div class="item-info">
+                    <h3>${c.name}</h3>
+                    <span class="item-subtitle">${c.subtitle}</span>
+                </div>
+                <div style="font-size: 1.5rem; color: var(--soft-gold)">→</div>`;
+        li.onclick = () => openModal(c);
+        list.appendChild(li);
+    });
+
+    const modal = document.getElementById('modal-container');
+    function openModal(c) {
+        document.getElementById('detail-name').innerText = c.name;
+        document.getElementById('detail-subtitle').innerText = c.subtitle;
+        document.getElementById('detail-history').innerText = c.history;
+        document.getElementById('detail-ingredients').innerHTML = c.ingredients.map(i => `<li>${i}</li>`).join('');
+        modal.classList.add('open');
+    }
+    document.querySelector('.close-btn').onclick = () => modal.classList.remove('open');
+    modal.onclick = (e) => e.target === modal && modal.classList.remove('open');
+
+    // --- EFEITO ANTIGRAVIT + NEVE ---
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let mouse = { x: null, y: null };
+
+    function initCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('mousemove', e => { mouse.x = e.x; mouse.y = e.y; });
+    window.addEventListener('touchstart', e => { mouse.x = e.touches[0].clientX; mouse.y = e.touches[0].clientY; });
+    window.addEventListener('resize', initCanvas);
+    initCanvas();
+
+    class Particle {
+        constructor() {
+            this.reset();
+        }
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2 + 1;
+            this.speedY = Math.random() * 0.8 + 0.3; // Velocidade de queda (neve)
+            this.speedX = (Math.random() - 0.5) * 0.5;
+            this.opacity = Math.random() * 0.5 + 0.2;
+        }
+        draw() {
+            ctx.fillStyle = `rgba(197, 160, 89, ${this.opacity})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        update() {
+            // Movimento constante de neve
+            this.y += this.speedY;
+            this.x += this.speedX;
+
+            // Atração Suave pelo Mouse (Estilo Antigravit)
+            if (mouse.x != null) {
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx*dx + dy*dy);
+
+                if (distance < 180) { // Raio de influência
+                    this.x += dx * 0.03; // Atração suave sem "brincar"
+                    this.y += dy * 0.03;
+                }
+            }
+
+            // Resetar quando sair da tela
+            if (this.y > canvas.height) {
+                this.y = -10;
+                this.x = Math.random() * canvas.width;
+            }
+            if (this.x > canvas.width) this.x = 0;
+            if (this.x < 0) this.x = canvas.width;
+        }
+    }
+
+    for (let i = 0; i < 70; i++) particles.push(new Particle());
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(animate);
+    }
+    animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Christmas McGrath Bar | Premium Experience</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* 
+         * CHRISTMAS MCGRATH BAR - PREMIUM STYLES
+         * Palette: Wine (#4a0404), Cream (#fcfbf8), Gold (#c5a059)
+         */
+
+        :root {
+            --primary-wine: #4a0404;
+            --accent-gold: #c5a059;
+            --bg-cream: #fcfbf8;
+            --text-dark: #1a1a1a;
+            --text-light: #ffffff;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Montserrat', sans-serif;
+            --glass-blur: 15px;
+            --transition-smooth: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-body);
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* WATERMARK */
+        body::before {
+            content: 'McGrath';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-family: var(--font-heading);
+            font-size: 15vw;
+            color: var(--primary-wine);
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: -1;
+            white-space: nowrap;
+        }
+
+        /* PARTICLE CANVAS */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2; /* Behind watermark and content */
+            pointer-events: none; /* Let clicks pass through */
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            padding: 4rem 1.5rem 2rem;
+            position: relative;
+        }
+
+        h1 {
+            font-family: var(--font-heading);
+            color: var(--primary-wine);
+            font-size: 2.5rem;
+            margin: 0;
+            line-height: 1.1;
+            opacity: 0;
+            animation: fadeInDown 1.2s ease forwards;
+        }
+
+        .subtitle {
+            display: block;
+            margin-top: 0.5rem;
+            font-family: var(--font-heading);
+            font-style: italic;
+            color: var(--accent-gold);
+            font-size: 1.2rem;
+            font-weight: 400;
+        }
+
+        .intro-text {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+            opacity: 0;
+            animation: fadeIn 1.5s ease 0.5s forwards;
+        }
+
+        /* COCKTAIL LIST */
+        .menu-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 5rem;
+        }
+
+        .cocktail-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .cocktail-item {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(197, 160, 89, 0.1); /* Subtle gold border */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            cursor: pointer;
+            transition: transform 0.3s ease, opacity 0.3s ease, filter 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            opacity: 0;
+            animation: slideUpFade 0.6s ease forwards;
+        }
+
+        /* Staggered animation delays handled in JS or Nth-child */
+        .cocktail-item:nth-child(1) { animation-delay: 0.1s; }
+        .cocktail-item:nth-child(2) { animation-delay: 0.2s; }
+        .cocktail-item:nth-child(3) { animation-delay: 0.3s; }
+        .cocktail-item:nth-child(4) { animation-delay: 0.4s; }
+        .cocktail-item:nth-child(5) { animation-delay: 0.5s; }
+
+        .item-content h2 {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            margin: 0 0 0.3rem 0;
+            color: var(--primary-wine);
+            font-weight: 600;
+        }
+
+        .item-content span {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent-gold);
+            font-weight: 500;
+        }
+
+        .item-arrow {
+            color: #ddd;
+            font-size: 1.5rem;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        /* INTERACTION: FOCUS & BLUR */
+        
+        /* When hovering the list, blur non-hovered items */
+        @media (hover: hover) and (pointer: fine) {
+            .cocktail-list:hover .cocktail-item:not(:hover) {
+                filter: blur(3px);
+                opacity: 0.6;
+                transform: scale(0.98);
+            }
+
+            .cocktail-item:hover {
+                transform: scale(1.02);
+                box-shadow: 0 10px 20px rgba(74, 4, 4, 0.08);
+                border-color: rgba(197, 160, 89, 0.4);
+                background: white;
+                z-index: 10;
+            }
+
+            .cocktail-item:hover .item-arrow {
+                color: var(--primary-wine);
+                transform: translateX(5px);
+            }
+        }
+
+        /* TOUCH FEEDBACK */
+        .cocktail-item:active {
+            transform: scale(0.97);
+            background: white;
+            transition: transform 0.1s;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            
+            /* GLASSMORPHISM */
+            background: rgba(44, 4, 4, 0.2); 
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%;
+            max-width: 500px;
+            padding: 2.5rem;
+            border-radius: 2px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            position: relative;
+            transform: translateY(30px) scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border-top: 4px solid var(--primary-wine);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1.2rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #aaa;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0.5rem; /* Increase touch area */
+        }
+        
+        .close-btn:hover {
+            color: var(--primary-wine);
+        }
+
+        .modal-title {
+            font-family: var(--font-heading);
+            font-size: 2.2rem;
+            color: var(--primary-wine);
+            margin: 0 0 0.5rem 0;
+        }
+
+        .modal-subtitle {
+            font-family: var(--font-body);
+            font-style: italic;
+            color: var(--accent-gold);
+            font-size: 1rem;
+            display: block;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-section-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #888;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .ingredients-list {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2rem 0;
+        }
+
+        .ingredients-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+        }
+
+        .ingredients-list li::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--accent-gold);
+            margin-right: 12px;
+        }
+
+        .history-text {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: #444;
+            text-align: justify;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #aaa;
+            padding: 2rem;
+            margin-top: auto;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* MOBILE ADJUSTMENTS */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .modal-card { padding: 2rem 1.5rem; margin: 1rem; width: auto; }
+            .modal-title { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Particle Background -->
+    <canvas id="particle-canvas"></canvas>
+
+    <header>
+        <h1>Christmas McGrath Bar<span class="subtitle">Special Edition</span></h1>
+        <p class="intro-text">
+            Welcome to our family table. <br>
+            A curated selection of fine cocktails for a memorable evening.
+        </p>
+    </header>
+
+    <main class="menu-container">
+        <ul class="cocktail-list" id="cocktail-list">
+            <!-- JavaScript will populate this -->
+        </ul>
+    </main>
+
+    <footer>
+        &copy; 2024 McGrath Family Bar
+    </footer>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-card">
+            <button class="close-btn" aria-label="Close details">&times;</button>
+            <h2 class="modal-title" id="modal-title">Title</h2>
+            <span class="modal-subtitle" id="modal-subtitle">Subtitle</span>
+            
+            <div class="modal-section-title">Ingredients</div>
+            <ul class="ingredients-list" id="modal-ingredients">
+                <!-- Ingredients -->
+            </ul>
+
+            <div class="modal-section-title">The Story</div>
+            <p class="history-text" id="modal-history">
+                <!-- History -->
+            </p>
+        </div>
+    </div>
+
+    <!-- MAIN SCRIPT -->
+    <script>
+        /**
+         * COCKTAIL DATA
+         */
+        const cocktails = [
+            {
+                name: "Boulevardier",
+                subtitle: "A bold classic with a whiskey soul",
+                ingredients: ["30 ml Powers Irish Whiskey", "30 ml Campari", "30 ml Martini Rosso", "Orange twist"],
+                history: "A cousin to the Negroni, the Boulevardier swaps gin for the warmth of whiskey. Legend has it this drink was created by Erskine Gwynne, an American-born writer who founded a monthly magazine in Paris called 'The Boulevardier' in the 1920s."
+            },
+            {
+                name: "Espresso Martini",
+                subtitle: "The modern coffee classic",
+                ingredients: ["40 ml Vodka", "30 ml Coffee liqueur", "30 ml Fresh espresso", "Optional sugar"],
+                history: "Created in the 1980s by Dick Bradsell at Fred's Club in London. A famous model allegedly asked for something that would 'wake me up and f**k me up'. The result is a cold, coffee-flavored cocktail with a rich, creamy foam."
+            },
+            {
+                name: "Aperol Spritz",
+                subtitle: "Light, refreshing and social",
+                ingredients: ["60 ml Aperol", "90 ml Prosecco Mionetto", "Splash of sparkling water", "Orange slice"],
+                history: "Originating from Northern Italy, the Spritz became an icon of the 'Dolce Vita'. It's the perfect pre-dinner drink (aperitivo) to stimulate the appetite, famous for its bright orange color and bittersweet taste."
+            },
+            {
+                name: "Penicillin",
+                subtitle: "A modern classic for cold nights",
+                ingredients: ["50 ml Powers Irish Whiskey", "25 ml Fresh lemon juice", "20 ml Honey syrup", "Fresh ginger"],
+                history: "A modern classic created by Sam Ross in New York in 2005. It takes the soothing flavors of honey, lemon, and ginger and fortifies them with whiskey. It's essentially a cold, alcoholic toddy that cures all ills."
+            },
+            {
+                name: "Basil Smash",
+                subtitle: "Fresh, green and unexpected",
+                ingredients: ["50 ml Beefeater London Dry Gin", "25 ml Fresh lemon juice", "Fresh basil leaves", "Sugar syrup"],
+                history: "Created in 2008 by Jörg Meyer in Hamburg, Germany. This drink is a vibrant green color thanks to the large amount of fresh basil muddled into the shaker. It's a perfect balance of herbal freshness and citrus zest."
+            }
+        ];
+
+        /**
+         * APP CONTROLLER
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            initMenu();
+            initParticles();
+            initModalEvents();
+        });
+
+        // --- Menu Rendering ---
+        function initMenu() {
+            const list = document.getElementById('cocktail-list');
+            cocktails.forEach(drink => {
+                const li = document.createElement('li');
+                li.className = 'cocktail-item';
+                li.innerHTML = `
+                    <div class="item-content">
+                        <h2>${drink.name}</h2>
+                        <span>${drink.subtitle}</span>
+                    </div>
+                    <div class="item-arrow">&#10095;</div>
+                `;
+                li.addEventListener('click', () => openModal(drink));
+                list.appendChild(li);
+            });
+        }
+
+        // --- Modal Logic ---
+        const modal = document.getElementById('modal-overlay');
+        const modalTitle = document.getElementById('modal-title');
+        const modalSubtitle = document.getElementById('modal-subtitle');
+        const modalIng = document.getElementById('modal-ingredients');
+        const modalHist = document.getElementById('modal-history');
+        const closeBtn = document.querySelector('.close-btn');
+
+        function openModal(drink) {
+            modalTitle.textContent = drink.name;
+            modalSubtitle.textContent = drink.subtitle;
+            modalHist.textContent = drink.history;
+            
+            modalIng.innerHTML = '';
+            drink.ingredients.forEach(ing => {
+                const li = document.createElement('li');
+                li.textContent = ing;
+                modalIng.appendChild(li);
+            });
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function initModalEvents() {
+            closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+            });
+        }
+
+        // --- Particle System (Antigravit Inspired) ---
+        function initParticles() {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let width, height;
+            let particles = [];
+            
+            // Mouse/Touch state
+            const mouse = { x: null, y: null, radius: 150 };
+
+            // Resize handling
+            function resize() {
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                initPixelParticles();
+            }
+            window.addEventListener('resize', resize);
+            
+            // Interaction listeners
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.x;
+                mouse.y = e.y;
+            });
+            window.addEventListener('touchmove', (e) => {
+                if(e.touches.length > 0) {
+                    mouse.x = e.touches[0].clientX;
+                    mouse.y = e.touches[0].clientY;
+                }
+            }, {passive: true});
+            window.addEventListener('touchend', () => {
+                mouse.x = null;
+                mouse.y = null;
+            });
+            window.addEventListener('mouseout', () => {
+                mouse.x = null;
+                mouse.y = null;
+            });
+
+            // Particle Class
+            class Particle {
+                constructor(x, y, size, color, speedY) {
+                    this.x = x;
+                    this.y = y;
+                    this.baseX = x; // Not used for falling snow, but good for returning
+                    this.size = size;
+                    this.color = color;
+                    this.speedY = speedY;
+                    this.speedX = (Math.random() - 0.5) * 0.5; // Slight drift
+                    this.density = (Math.random() * 30) + 1;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.closePath();
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+
+                update() {
+                    // Physics: Fall & Drift
+                    this.y += this.speedY;
+                    this.x += this.speedX;
+
+                    // Mouse Attraction (Antigravity Style)
+                    // If mouse is close, accelerate towards it or swirl around it
+                    if (mouse.x != null && mouse.y != null) {
+                        let dx = mouse.x - this.x;
+                        let dy = mouse.y - this.y;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < mouse.radius) {
+                            // Attraction force
+                            const forceDirectionX = dx / distance;
+                            const forceDirectionY = dy / distance;
+                            const maxDistance = mouse.radius;
+                            const force = (maxDistance - distance) / maxDistance;
+                            const directionX = forceDirectionX * force * this.density * 0.6;
+                            const directionY = forceDirectionY * force * this.density * 0.6;
+                            
+                            this.x += directionX;
+                            this.y += directionY;
+                        }
+                    }
+
+                    // Reset if out of bounds (loop)
+                    if (this.y > height) {
+                        this.y = 0 - this.size;
+                        this.x = Math.random() * width;
+                    }
+                    if (this.x > width || this.x < 0) {
+                        this.x = Math.random() * width; // Wrap horizontally if drifted too far
+                    }
+                }
+            }
+
+            function initPixelParticles() {
+                particles = [];
+                // Calculate number of particles based on screen size (Mobile optimization)
+                const numberOfParticles = (width * height) / 9000; 
+                
+                for (let i = 0; i < numberOfParticles; i++) {
+                    const size = Math.random() * 2 + 0.5; // Small, elegant dots
+                    const x = Math.random() * width;
+                    const y = Math.random() * height;
+                    const speedY = Math.random() * 1 + 0.2; // Gentle fall
+                    
+                    // Mix of Gold (#c5a059) and White
+                    const isGold = Math.random() > 0.6;
+                    const color = isGold ? 'rgba(197, 160, 89, 0.8)' : 'rgba(255, 255, 255, 0.6)';
+
+                    particles.push(new Particle(x, y, size, color, speedY));
+                }
+            }
+
+            // Animation Loop
+            function animate() {
+                ctx.clearRect(0, 0, width, height);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                requestAnimationFrame(animate);
+            }
+
+            // Start
+            resize();
+            animate();
+        }
+    </script>
+</body>
+</html>
